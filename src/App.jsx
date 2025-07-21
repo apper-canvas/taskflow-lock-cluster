@@ -336,7 +336,7 @@ function AuthenticatedApp() {
     );
   }
 
-  return (
+return (
     <AuthContext.Provider value={authMethods}>
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -345,7 +345,17 @@ function AuthenticatedApp() {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/prompt-password/:appId/:emailAddress/:provider" element={<PromptPassword />} />
         <Route path="/reset-password/:appId/:fields" element={<ResetPassword />} />
+        
+        {/* Protected Routes - All at the same level */}
         <Route path="/" element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+        
+        <Route path="/dashboard" element={
           isAuthenticated ? (
             <div className="flex h-screen bg-gray-100">
               <Sidebar
@@ -354,13 +364,7 @@ function AuthenticatedApp() {
                 onCreateProject={handleCreateProject}
               />
               <div className="flex-1 flex flex-col overflow-hidden">
-                <Routes>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<Dashboard onProjectCreate={handleCreateProject} />} />
-                  <Route path="/project/:projectId" element={<ProjectView />} />
-                  <Route path="/calendar" element={<Calendar />} />
-                  <Route path="/settings" element={<Settings />} />
-                </Routes>
+                <Dashboard onProjectCreate={handleCreateProject} />
               </div>
               <ProjectModal
                 isOpen={isProjectModalOpen}
@@ -374,6 +378,79 @@ function AuthenticatedApp() {
             <Navigate to="/login" replace />
           )
         } />
+        
+        <Route path="/project/:projectId" element={
+          isAuthenticated ? (
+            <div className="flex h-screen bg-gray-100">
+              <Sidebar
+                projects={projects}
+                currentProject={currentProject}
+                onCreateProject={handleCreateProject}
+              />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <ProjectView />
+              </div>
+              <ProjectModal
+                isOpen={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                onSave={handleProjectSave}
+                formData={projectFormData}
+                setFormData={setProjectFormData}
+              />
+            </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+        
+        <Route path="/calendar" element={
+          isAuthenticated ? (
+            <div className="flex h-screen bg-gray-100">
+              <Sidebar
+                projects={projects}
+                currentProject={currentProject}
+                onCreateProject={handleCreateProject}
+              />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <Calendar />
+              </div>
+              <ProjectModal
+                isOpen={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                onSave={handleProjectSave}
+                formData={projectFormData}
+                setFormData={setProjectFormData}
+              />
+            </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+        
+        <Route path="/settings" element={
+          isAuthenticated ? (
+            <div className="flex h-screen bg-gray-100">
+              <Sidebar
+                projects={projects}
+                currentProject={currentProject}
+                onCreateProject={handleCreateProject}
+              />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <Settings />
+              </div>
+              <ProjectModal
+                isOpen={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                onSave={handleProjectSave}
+                formData={projectFormData}
+                setFormData={setProjectFormData}
+              />
+            </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthContext.Provider>
