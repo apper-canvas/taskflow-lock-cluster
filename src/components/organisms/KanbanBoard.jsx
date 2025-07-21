@@ -13,6 +13,8 @@ const KanbanColumn = ({
   onTaskUpdate, 
   onTaskEdit, 
   onTaskDelete,
+  selectedTaskIds,
+  handleTaskSelect,
   dragHandlers,
   isDragOver 
 }) => {
@@ -335,7 +337,7 @@ const handleTaskSelect = (taskId, isSelected) => {
             column={column}
             tasks={groupedTasks[column.name] || []}
             onTaskUpdate={handleTaskMove}
-            onTaskEdit={handleTaskEdit}
+onTaskEdit={handleTaskEdit}
             onTaskDelete={handleTaskDelete}
             selectedTaskIds={selectedTaskIds}
             handleTaskSelect={handleTaskSelect}
