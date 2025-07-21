@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
 import Badge from "@/components/atoms/Badge";
 
-const TaskCard = ({ task, onEdit, onDelete, ...dragHandlers }) => {
+const TaskCard = ({ task, onEdit, onDelete, isSelected = false, onSelect, ...dragHandlers }) => {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "High": return "high";
@@ -23,18 +23,35 @@ const TaskCard = ({ task, onEdit, onDelete, ...dragHandlers }) => {
     return format(new Date(dateString), "MMM dd");
   };
 
-  return (
+return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       whileHover={{ scale: 1.02 }}
-      className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer group"
+      className={`bg-white rounded-xl p-4 shadow-sm border transition-all duration-200 cursor-pointer group relative ${
+        isSelected 
+          ? 'border-primary-500 bg-primary-50/30 shadow-md' 
+          : 'border-gray-100 hover:shadow-md'
+      }`}
       draggable
       {...dragHandlers}
     >
-      <div className="space-y-3">
+      {/* Selection Checkbox */}
+      <div 
+        className="absolute top-3 left-3 z-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => onSelect?.(e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 text-primary-600 bg-white border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+        />
+      </div>
+<div className="space-y-3 pl-6">
         {/* Title and Priority */}
         <div className="flex items-start justify-between">
           <h4 className="font-medium text-gray-900 text-sm leading-tight flex-1 pr-2">

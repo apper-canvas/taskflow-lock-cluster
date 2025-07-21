@@ -54,6 +54,43 @@ const taskService = {
       return { ...deleted };
     }
     return null;
+},
+
+  async bulkUpdate(ids, data) {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const updatedTasks = [];
+    
+    for (const id of ids) {
+      const index = tasks.findIndex(t => t.Id === parseInt(id));
+      if (index !== -1) {
+        tasks[index] = {
+          ...tasks[index],
+          ...data,
+          updatedAt: new Date().toISOString()
+        };
+        updatedTasks.push({ ...tasks[index] });
+      }
+    }
+    
+    return updatedTasks;
+  },
+
+  async bulkDelete(ids) {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const deletedTasks = [];
+    
+    // Sort IDs in descending order to maintain array indices during deletion
+    const sortedIds = ids.map(id => parseInt(id)).sort((a, b) => b - a);
+    
+    for (const id of sortedIds) {
+      const index = tasks.findIndex(t => t.Id === id);
+      if (index !== -1) {
+        const deleted = tasks.splice(index, 1)[0];
+        deletedTasks.push({ ...deleted });
+      }
+    }
+    
+    return deletedTasks;
   }
 };
 

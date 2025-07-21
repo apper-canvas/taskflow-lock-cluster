@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
-import ApperIcon from "@/components/ApperIcon";
-import TaskCard from "@/components/molecules/TaskCard";
-import TaskModal from "@/components/molecules/TaskModal";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import ApperIcon from "@/components/ApperIcon";
+import TaskModal from "@/components/molecules/TaskModal";
+import TaskCard from "@/components/molecules/TaskCard";
 import taskService from "@/services/api/taskService";
 
 const KanbanColumn = ({ 
@@ -63,7 +63,7 @@ const KanbanColumn = ({
         {...dragHandlers}
       >
         <AnimatePresence>
-          {tasks.map((task) => (
+{tasks.map((task) => (
             <TaskCard
               key={task.Id}
               task={task}
@@ -71,6 +71,8 @@ const KanbanColumn = ({
               onDelete={onTaskDelete}
               onDragStart={(e) => dragHandlers.onDragStart?.(e, task)}
               onDragEnd={dragHandlers.onDragEnd}
+              isSelected={selectedTaskIds.has(task.Id)}
+              onSelect={(isSelected) => handleTaskSelect(task.Id, isSelected)}
             />
           ))}
         </AnimatePresence>
@@ -86,6 +88,73 @@ const KanbanColumn = ({
   );
 };
 
+const BulkActionToolbar = ({ selectedCount, onBulkMove, onBulkDelete, onClearSelection }) => {
+  const [showMoveOptions, setShowMoveOptions] = useState(false);
+  
+  const statusOptions = [
+    { value: "To Do", label: "To Do" },
+    { value: "In Progress", label: "In Progress" }, 
+    { value: "Done", label: "Done" }
+  ];
+
+  return (
+    <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <ApperIcon name="CheckSquare" size={20} className="text-primary-600" />
+          <span className="font-medium text-gray-900">
+            {selectedCount} task{selectedCount !== 1 ? 's' : ''} selected
+          </span>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <div className="relative">
+            <button
+              onClick={() => setShowMoveOptions(!showMoveOptions)}
+              className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700 transition-colors duration-200"
+            >
+              <ApperIcon name="ArrowRight" size={16} />
+              <span>Move To</span>
+            </button>
+            
+            {showMoveOptions && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                {statusOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      onBulkMove(option.value);
+                      setShowMoveOptions(false);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <button
+            onClick={onBulkDelete}
+            className="flex items-center space-x-2 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors duration-200"
+          >
+            <ApperIcon name="Trash2" size={16} />
+            <span>Delete</span>
+          </button>
+        </div>
+      </div>
+      
+      <button
+        onClick={onClearSelection}
+        className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+      >
+        Clear Selection
+      </button>
+    </div>
+  );
+};
+
 const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
   const [groupedTasks, setGroupedTasks] = useState({
     "To Do": [],
@@ -94,6 +163,7 @@ const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
   });
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState(new Set());
 
   const {
     draggedItem,
@@ -182,10 +252,87 @@ const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
       }
     }
   };
+const handleTaskSelect = (taskId, isSelected) => {
+    setSelectedTaskIds(prev => {
+      const newSet = new Set(prev);
+      if (isSelected) {
+        newSet.add(taskId);
+      } else {
+        newSet.delete(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleBulkMove = async (targetStatus) => {
+    const selectedTasks = tasks.filter(task => selectedTaskIds.has(task.Id));
+    const tasksToMove = selectedTasks.filter(task => task.status !== targetStatus);
+    
+    if (tasksToMove.length === 0) {
+      toast.info(`All selected tasks are already in ${targetStatus}`);
+      return;
+    }
+
+    try {
+      const updatedTasks = await taskService.bulkUpdate(
+        Array.from(selectedTaskIds),
+        { status: targetStatus }
+      );
+      
+      const newTasks = tasks.map(task => {
+        const updated = updatedTasks.find(ut => ut.Id === task.Id);
+        return updated || task;
+      });
+      
+      onTasksChange(newTasks);
+      setSelectedTaskIds(new Set());
+      toast.success(`${tasksToMove.length} task${tasksToMove.length !== 1 ? 's' : ''} moved to ${targetStatus}!`);
+    } catch (error) {
+      toast.error("Failed to move selected tasks");
+      console.error("Error moving tasks:", error);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    const selectedCount = selectedTaskIds.size;
+    if (window.confirm(`Are you sure you want to delete ${selectedCount} selected task${selectedCount !== 1 ? 's' : ''}?`)) {
+      try {
+        await taskService.bulkDelete(Array.from(selectedTaskIds));
+        const updatedTasks = tasks.filter(task => !selectedTaskIds.has(task.Id));
+        onTasksChange(updatedTasks);
+        setSelectedTaskIds(new Set());
+        toast.success(`${selectedCount} task${selectedCount !== 1 ? 's' : ''} deleted successfully!`);
+      } catch (error) {
+        toast.error("Failed to delete selected tasks");
+        console.error("Error deleting tasks:", error);
+      }
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedTaskIds(new Set());
+  };
+
+  // Clear selection when tasks change externally (like from filters)
+  useEffect(() => {
+    const currentTaskIds = new Set(tasks.map(task => task.Id));
+    setSelectedTaskIds(prev => {
+      const filtered = new Set([...prev].filter(id => currentTaskIds.has(id)));
+      return filtered.size !== prev.size ? filtered : prev;
+    });
+  }, [tasks]);
 
   return (
     <>
-      <div className="flex gap-6 overflow-x-auto pb-6 px-6">
+      {selectedTaskIds.size > 0 && (
+        <BulkActionToolbar
+          selectedCount={selectedTaskIds.size}
+          onBulkMove={handleBulkMove}
+          onBulkDelete={handleBulkDelete}
+          onClearSelection={handleClearSelection}
+        />
+      )}
+<div className="flex gap-6 overflow-x-auto pb-6 px-6">
         {columns.map((column) => (
           <KanbanColumn
             key={column.Id}
@@ -194,6 +341,8 @@ const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
             onTaskUpdate={handleTaskMove}
             onTaskEdit={handleTaskEdit}
             onTaskDelete={handleTaskDelete}
+            selectedTaskIds={selectedTaskIds}
+            handleTaskSelect={handleTaskSelect}
             isDragOver={dragOverColumn === column.name}
             dragHandlers={{
               onDragStart: handleDragStart,
@@ -205,7 +354,6 @@ const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
           />
         ))}
       </div>
-
       <TaskModal
         isOpen={isModalOpen}
         onClose={() => {
