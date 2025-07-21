@@ -1,0 +1,30 @@
+[
+  {
+    "Id": 1,
+    "name": "Website Redesign",
+    "description": "Complete overhaul of the company website with modern design and improved UX",
+    "createdAt": "2024-01-15T09:00:00Z",
+    "updatedAt": "2024-01-20T14:30:00Z"
+  },
+  {
+    "Id": 2,
+    "name": "Mobile App Development",
+    "description": "Native mobile application for iOS and Android platforms",
+    "createdAt": "2024-01-10T10:15:00Z",
+    "updatedAt": "2024-01-22T11:45:00Z"
+  },
+  {
+    "Id": 3,
+    "name": "API Integration",
+    "description": "Integration with third-party APIs for enhanced functionality",
+    "createdAt": "2024-01-20T08:30:00Z",
+    "updatedAt": "2024-01-23T16:20:00Z"
+  },
+  {
+    "Id": 4,
+    "name": "Database Migration",
+    "description": "Migration from legacy database to modern cloud infrastructure",
+    "createdAt": "2024-01-12T13:45:00Z",
+    "updatedAt": "2024-01-21T09:15:00Z"
+  }
+]

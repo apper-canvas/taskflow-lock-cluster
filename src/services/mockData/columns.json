@@ -1,0 +1,86 @@
+[
+  {
+    "Id": 1,
+    "projectId": 1,
+    "name": "To Do",
+    "order": 1,
+    "color": "#6b7280"
+  },
+  {
+    "Id": 2,
+    "projectId": 1,
+    "name": "In Progress",
+    "order": 2,
+    "color": "#3b82f6"
+  },
+  {
+    "Id": 3,
+    "projectId": 1,
+    "name": "Done",
+    "order": 3,
+    "color": "#10b981"
+  },
+  {
+    "Id": 4,
+    "projectId": 2,
+    "name": "To Do",
+    "order": 1,
+    "color": "#6b7280"
+  },
+  {
+    "Id": 5,
+    "projectId": 2,
+    "name": "In Progress",
+    "order": 2,
+    "color": "#3b82f6"
+  },
+  {
+    "Id": 6,
+    "projectId": 2,
+    "name": "Done",
+    "order": 3,
+    "color": "#10b981"
+  },
+  {
+    "Id": 7,
+    "projectId": 3,
+    "name": "To Do",
+    "order": 1,
+    "color": "#6b7280"
+  },
+  {
+    "Id": 8,
+    "projectId": 3,
+    "name": "In Progress",
+    "order": 2,
+    "color": "#3b82f6"
+  },
+  {
+    "Id": 9,
+    "projectId": 3,
+    "name": "Done",
+    "order": 3,
+    "color": "#10b981"
+  },
+  {
+    "Id": 10,
+    "projectId": 4,
+    "name": "To Do",
+    "order": 1,
+    "color": "#6b7280"
+  },
+  {
+    "Id": 11,
+    "projectId": 4,
+    "name": "In Progress",
+    "order": 2,
+    "color": "#3b82f6"
+  },
+  {
+    "Id": 12,
+    "projectId": 4,
+    "name": "Done",
+    "order": 3,
+    "color": "#10b981"
+  }
+]
