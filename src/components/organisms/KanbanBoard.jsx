@@ -135,7 +135,7 @@ const BulkActionToolbar = ({ selectedCount, onBulkMove, onBulkDelete, onClearSel
             )}
           </div>
           
-          <button
+<button
             onClick={onBulkDelete}
             className="flex items-center space-x-2 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors duration-200"
           >
@@ -196,22 +196,19 @@ const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
 
     try {
       const updatedTask = await taskService.update(task.Id, {
-        status: targetStatus
+status: targetStatus
       });
       
-      if (updatedTask) {
-        const updatedTasks = tasks.map(t => 
-          t.Id === task.Id ? updatedTask : t
-        );
-        onTasksChange(updatedTasks);
-        toast.success("Task moved successfully!");
-      }
+      const updatedTasks = tasks.map(t => 
+        t.Id === task.Id ? { ...t, status: targetStatus } : t
+      );
+      onTasksChange(updatedTasks);
+      toast.success(`Task moved to ${targetStatus}!`);
     } catch (error) {
       toast.error("Failed to move task");
       console.error("Error moving task:", error);
     }
   };
-
   const handleTaskEdit = (task) => {
     setSelectedTask(task);
     setIsModalOpen(true);
@@ -263,7 +260,6 @@ const handleTaskSelect = (taskId, isSelected) => {
       return newSet;
     });
   };
-
   const handleBulkMove = async (targetStatus) => {
     const selectedTasks = tasks.filter(task => selectedTaskIds.has(task.Id));
     const tasksToMove = selectedTasks.filter(task => task.status !== targetStatus);
