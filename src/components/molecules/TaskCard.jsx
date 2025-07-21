@@ -36,6 +36,7 @@ return (
           : 'border-gray-100 hover:shadow-md'
       }`}
       draggable
+      onClick={() => onEdit?.(task)}
       {...dragHandlers}
     >
       {/* Selection Checkbox */}

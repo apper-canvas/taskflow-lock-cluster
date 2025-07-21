@@ -11,12 +11,13 @@ const KanbanColumn = ({
   column, 
   tasks, 
   onTaskUpdate, 
+  onEdit,
   onTaskEdit, 
   onTaskDelete,
   selectedTaskIds,
   handleTaskSelect,
   dragHandlers,
-  isDragOver 
+  isDragOver
 }) => {
   const getColumnIcon = (status) => {
     switch (status) {
@@ -163,8 +164,9 @@ const KanbanBoard = ({ projectId, tasks, onTasksChange }) => {
     "In Progress": [],
     "Done": []
   });
-  const [selectedTask, setSelectedTask] = useState(null);
+const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewOnly, setIsViewOnly] = useState(false);
   const [selectedTaskIds, setSelectedTaskIds] = useState(new Set());
 
   const {
@@ -211,8 +213,15 @@ status: targetStatus
       console.error("Error moving task:", error);
     }
   };
+const handleTaskView = (task) => {
+    setSelectedTask(task);
+    setIsViewOnly(true);
+    setIsModalOpen(true);
+  };
+
   const handleTaskEdit = (task) => {
     setSelectedTask(task);
+    setIsViewOnly(false);
     setIsModalOpen(true);
   };
 
@@ -231,7 +240,8 @@ status: targetStatus
         onTasksChange([...tasks, updatedTask]);
         toast.success("Task created successfully!");
       }
-      setSelectedTask(null);
+setSelectedTask(null);
+      setIsViewOnly(false);
     } catch (error) {
       toast.error(selectedTask ? "Failed to update task" : "Failed to create task");
       console.error("Error saving task:", error);
@@ -337,7 +347,8 @@ const handleTaskSelect = (taskId, isSelected) => {
             column={column}
             tasks={groupedTasks[column.name] || []}
             onTaskUpdate={handleTaskMove}
-onTaskEdit={handleTaskEdit}
+onEdit={handleTaskView}
+            onTaskEdit={handleTaskEdit}
             onTaskDelete={handleTaskDelete}
             selectedTaskIds={selectedTaskIds}
             handleTaskSelect={handleTaskSelect}
@@ -352,15 +363,17 @@ onTaskEdit={handleTaskEdit}
           />
         ))}
       </div>
-      <TaskModal
+<TaskModal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedTask(null);
+          setIsViewOnly(false);
         }}
         onSave={handleTaskSave}
         task={selectedTask}
         projectId={projectId}
+        isViewOnly={isViewOnly}
       />
     </>
   );

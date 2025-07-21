@@ -6,7 +6,7 @@ import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
 import Select from "@/components/atoms/Select";
 
-const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId }) => {
+const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId, isViewOnly = false }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -75,9 +75,9 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId }) => {
           >
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+<div className="flex items-center justify-between p-6 border-b border-gray-100">
                 <h2 className="text-xl font-semibold text-gray-900 font-display">
-                  {task ? "Edit Task" : "Create New Task"}
+                  {isViewOnly ? "Task Details" : (task ? "Edit Task" : "Create New Task")}
                 </h2>
                 <button
                   onClick={onClose}
@@ -92,25 +92,27 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId }) => {
                 {/* Title */}
                 <div>
                   <Label htmlFor="title">Task Title</Label>
-                  <Input
+<Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => handleChange("title", e.target.value)}
                     placeholder="Enter task title..."
                     required
+                    disabled={isViewOnly}
                   />
                 </div>
 
                 {/* Description */}
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <textarea
+<textarea
                     id="description"
                     rows="3"
                     className="flex w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm ring-offset-white placeholder:text-gray-500 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none"
                     value={formData.description}
                     onChange={(e) => handleChange("description", e.target.value)}
                     placeholder="Enter task description..."
+                    disabled={isViewOnly}
                   />
                 </div>
 
@@ -118,10 +120,11 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="status">Status</Label>
-                    <Select
+<Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleChange("status", e.target.value)}
+                      disabled={isViewOnly}
                     >
                       <option value="To Do">To Do</option>
                       <option value="In Progress">In Progress</option>
@@ -131,10 +134,11 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId }) => {
 
                   <div>
                     <Label htmlFor="priority">Priority</Label>
-                    <Select
+<Select
                       id="priority"
                       value={formData.priority}
                       onChange={(e) => handleChange("priority", e.target.value)}
+                      disabled={isViewOnly}
                     >
                       <option value="High">High</option>
                       <option value="Medium">Medium</option>
@@ -146,40 +150,44 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, projectId }) => {
                 {/* Assignee */}
                 <div>
                   <Label htmlFor="assignee">Assignee</Label>
-                  <Input
+<Input
                     id="assignee"
                     value={formData.assignee}
                     onChange={(e) => handleChange("assignee", e.target.value)}
                     placeholder="Enter assignee name..."
+                    disabled={isViewOnly}
                   />
                 </div>
 
                 {/* Due Date */}
                 <div>
                   <Label htmlFor="dueDate">Due Date</Label>
-                  <Input
+<Input
                     id="dueDate"
                     type="date"
                     value={formData.dueDate}
                     onChange={(e) => handleChange("dueDate", e.target.value)}
+                    disabled={isViewOnly}
                   />
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+<div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={onClose}
                   >
-                    Cancel
+                    {isViewOnly ? "Close" : "Cancel"}
                   </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                  >
-                    {task ? "Update Task" : "Create Task"}
-                  </Button>
+                  {!isViewOnly && (
+                    <Button
+                      type="submit"
+                      variant="primary"
+                    >
+                      {task ? "Update Task" : "Create Task"}
+                    </Button>
+                  )}
                 </div>
               </form>
             </div>
