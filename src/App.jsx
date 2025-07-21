@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Navigate, Route, Router, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import { ToastContainer, toast } from "react-toastify";
@@ -478,9 +478,9 @@ const ProjectModal = ({ isOpen, onClose, onSave, formData, setFormData }) => {
 function App() {
   return (
     <Provider store={store}>
-      <Router>
+<BrowserRouter>
         <AuthenticatedApp />
-      </Router>
+      </BrowserRouter>
     </Provider>
   );
 }
